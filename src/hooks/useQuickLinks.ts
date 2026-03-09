@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { getStorage, setStorage } from '../utils/storage'
 import type { QuickLink } from '../types'
 
@@ -12,12 +12,12 @@ const defaultLinks: QuickLink[] = [
   { id: '5', title: '微博', url: 'https://weibo.com' },
   { id: '6', title: '豆瓣', url: 'https://www.douban.com' },
   { id: '7', title: '淘宝', url: 'https://www.taobao.com' },
-  { id: '8', title: '京东', url: 'https://www.jd.com' },
 ]
 
 export function useQuickLinks() {
   const [links, setLinks] = useState<QuickLink[]>([])
   const [loading, setLoading] = useState(true)
+  const initializedRef = useRef(false)
 
   useEffect(() => {
     getStorage<QuickLink[]>(QUICK_LINKS_KEY).then((saved) => {
@@ -28,52 +28,50 @@ export function useQuickLinks() {
         setStorage(QUICK_LINKS_KEY, defaultLinks)
       }
       setLoading(false)
+      initializedRef.current = true
     })
   }, [])
 
-  const addLink = useCallback(
-    async (link: Omit<QuickLink, 'id'>) => {
-      const newLink: QuickLink = {
-        ...link,
-        id: Date.now().toString(),
-      }
-      const newLinks = [...links, newLink]
-      setLinks(newLinks)
-      await setStorage(QUICK_LINKS_KEY, newLinks)
-    },
-    [links]
-  )
+  useEffect(() => {
+    if (initializedRef.current && links.length > 0) {
+      setStorage(QUICK_LINKS_KEY, links)
+    }
+  }, [links])
 
-  const updateLink = useCallback(
-    async (id: string, updates: Partial<QuickLink>) => {
-      const newLinks = links.map((link) =>
-        link.id === id ? { ...link, ...updates } : link
-      )
-      setLinks(newLinks)
-      await setStorage(QUICK_LINKS_KEY, newLinks)
-    },
-    [links]
-  )
+  const addLink = useCallback((link: Omit<QuickLink, 'id'>) => {
+    const newLink: QuickLink = {
+      ...link,
+      id: Date.now().toString(),
+    }
+    setLinks((prev) => [...prev, newLink])
+  }, [])
 
-  const removeLink = useCallback(
-    async (id: string) => {
-      const newLinks = links.filter((link) => link.id !== id)
-      setLinks(newLinks)
-      await setStorage(QUICK_LINKS_KEY, newLinks)
-    },
-    [links]
-  )
+  const updateLink = useCallback((id: string, updates: Partial<QuickLink>) => {
+    setLinks((prev) =>
+      prev.map((link) => (link.id === id ? { ...link, ...updates } : link))
+    )
+  }, [])
 
-  const reorderLinks = useCallback(
-    async (fromIndex: number, toIndex: number) => {
-      const newLinks = [...links]
+  const removeLink = useCallback((id: string) => {
+    setLinks((prev) => prev.filter((link) => link.id !== id))
+  }, [])
+
+  const reorderLinks = useCallback((fromIndex: number, toIndex: number) => {
+    setLinks((prev) => {
+      const newLinks = [...prev]
       const [removed] = newLinks.splice(fromIndex, 1)
       newLinks.splice(toIndex, 0, removed)
-      setLinks(newLinks)
-      await setStorage(QUICK_LINKS_KEY, newLinks)
-    },
-    [links]
-  )
+      return newLinks
+    })
+  }, [])
 
-  return { links, loading, addLink, updateLink, removeLink, reorderLinks }
+  return {
+    links,
+    loading,
+    addLink,
+    updateLink,
+    removeLink,
+    reorderLinks,
+    setLinks,
+  }
 }

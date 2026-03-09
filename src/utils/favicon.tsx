@@ -4,7 +4,6 @@ import type { QuickLink } from '../types'
 function getFaviconUrl(url: string): string {
   try {
     const { hostname } = new URL(url)
-    // 使用 Google favicon 服务，更可靠
     return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
   } catch {
     return ''
@@ -32,26 +31,38 @@ function generateColor(title: string): string {
 
 interface LinkIconProps {
   link: QuickLink
+  size?: 'sm' | 'md' | 'lg'
 }
 
-export function LinkIcon({ link }: LinkIconProps) {
+export function LinkIcon({ link, size = 'md' }: LinkIconProps) {
   const faviconUrl = link.icon || getFaviconUrl(link.url)
   const initial = getInitial(link.title)
   const bgColor = generateColor(link.title)
   const [error, setError] = useState(false)
 
+  const sizeClasses: Record<
+    'sm' | 'md' | 'lg',
+    { wrapper: string; inner: string }
+  > = {
+    sm: { wrapper: 'h-9 w-9', inner: 'h-6 w-6 text-lg' },
+    md: { wrapper: 'h-12 w-12', inner: 'h-8 w-8 text-xl' },
+    lg: { wrapper: 'h-14 w-14', inner: 'h-10 w-10 text-2xl' },
+  }
+
   return (
-    <div className="flex aspect-square w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
+    <div
+      className={`flex aspect-square items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm ${sizeClasses[size].wrapper}`}
+    >
       {faviconUrl && !error ? (
         <img
           src={faviconUrl}
           alt={link.title}
-          className="h-8 w-8 rounded object-contain"
+          className={`${sizeClasses[size].inner} rounded object-contain`}
           onError={() => setError(true)}
         />
       ) : (
         <span
-          className={`${bgColor} flex h-8 w-8 items-center justify-center rounded text-xl font-medium text-white`}
+          className={`${bgColor} flex ${sizeClasses[size].inner} items-center justify-center rounded font-medium text-white`}
         >
           {initial}
         </span>
