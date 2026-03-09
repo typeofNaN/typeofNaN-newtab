@@ -2,7 +2,9 @@
 
 一个简洁美观的 Chrome 新标签页扩展，替换浏览器默认新标签页为清新风格的自定义页面。
 
-![Preview](preview.png)
+![Preview](./shotscreens/preview1.png)
+
+![Preview](./shotscreens/preview2.png)
 
 ## 功能特性
 
