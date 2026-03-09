@@ -4,7 +4,7 @@ import type { QuickLink } from '../types'
 function getFaviconUrl(url: string): string {
   try {
     const { hostname } = new URL(url)
-    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
+    return `https://api.iowen.cn/favicon/${hostname}.png`
   } catch {
     return ''
   }
