@@ -41,6 +41,7 @@
 - **样式方案**: TailwindCSS 3
 - **拖拽功能**: @dnd-kit/core + @dnd-kit/sortable
 - **图标库**: @iconify/react
+- **壁纸**: picsum-image
 - **Chrome 扩展**: Manifest V3 + @crxjs/vite-plugin
 - **代码规范**: ESLint 9 (flat config) + Prettier 3
 - **包管理器**: pnpm
