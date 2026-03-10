@@ -1,11 +1,17 @@
 import { useState, useCallback, useEffect } from 'react'
+import { PicsumImage } from 'picsum-image'
 import { getStorage, setStorage } from '../utils/storage'
 
 const WALLPAPER_KEY = 'wallpaper_url'
 
 function generatePicsumUrl(): string {
   const id = Math.floor(Math.random() * 1000)
-  return `https://picsum.photos/id/${id}/1920/1080`
+  return PicsumImage.generateUrl({
+    id,
+    width: 1920,
+    height: 1080,
+    cache: false,
+  })
 }
 
 export function useWallpaper() {
