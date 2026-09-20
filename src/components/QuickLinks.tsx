@@ -229,7 +229,7 @@ function QuickLinks() {
   }
 
   return (
-    <div className="fixed bottom-20 left-1/2 z-20 -translate-x-1/2 select-none">
+    <div className="quick-links fixed bottom-20 left-1/2 z-20 -translate-x-1/2 select-none">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -239,7 +239,7 @@ function QuickLinks() {
           items={links.map((l) => l.id)}
           strategy={rectSortingStrategy}
         >
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="quick-links-grid flex flex-wrap justify-center gap-3">
             {links.map((link) =>
               editing ? (
                 <SortableItem

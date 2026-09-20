@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { useI18n } from '../i18n/useI18n'
 import { useSettingsContext } from '../context/SettingsContext'
@@ -25,6 +25,7 @@ const searchEngines: Record<
 const engineList: SearchEngine[] = ['baidu', 'google', 'bing']
 
 function SearchBar() {
+  const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [engine, setEngine] = useState<SearchEngine>('baidu')
   const { t, language } = useI18n()
@@ -33,6 +34,22 @@ function SearchBar() {
   useEffect(() => {
     setEngine(settings.defaultSearchEngine)
   }, [settings.defaultSearchEngine])
+
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      if (
+        event.key === '/' &&
+        !['INPUT', 'TEXTAREA'].includes(target.tagName)
+      ) {
+        event.preventDefault()
+        inputRef.current?.focus()
+      }
+      if (event.key === 'Escape') inputRef.current?.blur()
+    }
+    window.addEventListener('keydown', focusSearch)
+    return () => window.removeEventListener('keydown', focusSearch)
+  }, [])
 
   const engineName =
     language === 'zh'
@@ -98,6 +115,7 @@ function SearchBar() {
         )}
       </button>
       <input
+        ref={inputRef}
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
